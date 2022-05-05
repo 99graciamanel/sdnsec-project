@@ -29,10 +29,16 @@ sudo mn --topo single,3 --mac --controller remote --switch ovsk
 ```
 
 ```
+sudo ovs-vsctl add-port s1 s1-snort
+sudo ovs-ofctl show s1
+sudo snort -i s1-snort -A unsock -l /tmp -c /etc/snort/snort.conf
+```
+
+```
 sudo ovs-vsctl set Bridge s1 protocols=OpenFlow13
 ```
 ```
-sudo ryu-manager ryu/ryu/app/rest_firewall.py simple_monitor_13_telegraf.py
+sudo ryu-manager ryu/ryu/app/rest_firewall.py ryu/ryu/app/simple_switch_snort.py simple_monitor_13_telegraf.py
 ```
 
 ```
