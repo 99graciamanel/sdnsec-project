@@ -7,6 +7,7 @@ Copiar el telegraf.conf y ojo amb el /etc/snort/rules/*.rules
 ## Services
 
 ```
+sudo apt install hping3 -y && \
 sudo systemctl restart influxdb && \
 sudo systemctl restart telegraf && \
 sudo systemctl restart grafana-server && \
