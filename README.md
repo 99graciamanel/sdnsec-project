@@ -28,8 +28,9 @@ sudo mn --topo single,3 --mac --controller remote --switch ovsk
 ```
 ## Configure Mininet (set OpenFlow13 protocol and add port to switch s1 for snort). Then run SNORT
 
+
+Crec que s'hauria de fer sudo ovs-vsctl set Bridge s1 protocols=OpenFlow13 però aleshores no funciona lo altre...
 ```
-sudo ovs-vsctl set Bridge s1 protocols=OpenFlow13 && \
 sudo ovs-vsctl add-port s1 s1-snort && \
 sudo ovs-ofctl show s1 && \
 sudo snort -i s1-snort -A unsock -l /tmp -c /etc/snort/snort.conf
