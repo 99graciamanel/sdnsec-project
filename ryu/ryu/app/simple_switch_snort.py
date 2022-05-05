@@ -69,7 +69,7 @@ class SimpleSwitchSnort(app_manager.RyuApp):
     def _dump_alert(self, ev):
         msg = ev.msg
 
-        print('alertmsg: %s' % ''.join(msg.alertmsg))
+        print('alertmsg: %s' % msg.alertmsg[0].decode())
 
         self.packet_print(msg.pkt)
 

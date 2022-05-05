@@ -85,7 +85,7 @@ class SimpleSwitchController(ControllerBase):
     def list_mac_table(self, req, **kwargs):
 
         simple_switch = self.simple_switch_app
-        dpid = kwargs['dpid']
+        dpid = dpid_lib.str_to_dpid(kwargs['dpid'])
 
         if dpid not in simple_switch.mac_to_port:
             return Response(status=404)
@@ -99,7 +99,7 @@ class SimpleSwitchController(ControllerBase):
     def put_mac_table(self, req, **kwargs):
 
         simple_switch = self.simple_switch_app
-        dpid = kwargs['dpid']
+        dpid = dpid_lib.str_to_dpid(kwargs['dpid'])
         try:
             new_entry = req.json if req.body else {}
         except ValueError:
