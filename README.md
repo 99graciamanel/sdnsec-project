@@ -37,8 +37,13 @@ sudo snort -i s1-snort -A unsock -l /tmp -c /etc/snort/snort.conf
 ```
 sudo ovs-vsctl set Bridge s1 protocols=OpenFlow13
 ```
-```
+
 sudo ryu-manager ryu/ryu/app/rest_firewall.py ryu/ryu/app/simple_switch_snort.py simple_monitor_13_telegraf.py
+
+He tret el ryu/ryu/app/rest_firewall.py perquè si no no es poden fer proves ??¿?¿¿?¿?¿
+
+```
+sudo ryu-manager ryu/ryu/app/simple_switch_snort.py simple_monitor_13_telegraf.py
 ```
 
 ```
