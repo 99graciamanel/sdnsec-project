@@ -17,7 +17,15 @@ sudo cp telegraf/telegraf.conf /etc/telegraf/ && \
 sudo apt-get install -y libfontconfig1 && \
 wget https://dl.grafana.com/oss/release/grafana_7.4.3_amd64.deb && \
 sudo dpkg -i grafana_7.4.3_amd64.deb && \
-rm grafana_7.4.3_amd64.deb
+rm grafana_7.4.3_amd64.deb && \
+sudo apt-get install snort -y
+```
+
+Quan surti el popup, la iface que tinguis al pc i 10.0.0.0/16
+
+```
+sudo cp snort/snort.conf /etc/snort/ && \
+sudo cp snort/Myrules.rules /etc/snort/rules/
 ```
 
 ```
