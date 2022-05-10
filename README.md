@@ -9,7 +9,7 @@ sudo apt-get install mininet -y
 ```
 pip3 install ryu && \
 pip3 uninstall eventlet && \
-sudo pip3 install eventlet==0.30.2
+pip3 install eventlet==0.30.2
 ```
 
 ## Configs
