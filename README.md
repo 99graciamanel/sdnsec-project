@@ -13,7 +13,11 @@ wget https://dl.influxdata.com/telegraf/releases/telegraf_1.17.3-1_amd64.deb && 
 sudo dpkg -i telegraf_1.17.3-1_amd64.deb && \
 rm telegraf_1.17.3-1_amd64.deb && \
 sudo mv /etc/telegraf/telegraf.conf /etc/telegraf/telegraf.conf.bup && \
-sudo cp telegraf/telegraf.conf /etc/telegraf/
+sudo cp telegraf/telegraf.conf /etc/telegraf/ && \
+sudo apt-get install -y libfontconfig1 && \
+wget https://dl.grafana.com/oss/release/grafana_7.4.3_amd64.deb && \
+sudo dpkg -i grafana_7.4.3_amd64.deb && \
+rm grafana_7.4.3_amd64.deb
 ```
 
 ```
