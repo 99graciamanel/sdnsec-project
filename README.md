@@ -61,6 +61,20 @@ sudo ip link set s1-snort up
 sudo mn -c && \
 sudo mn --topo single,3 --mac --controller remote --switch ovsk
 ```
+
+## Configure apache server
+from outside the mininet
+```
+sudo systemctl stop apache2
+sudo gedit /etc/apache2/apache2.conf
+```
+add the following line to the document ServiceName 10.0.0.1
+
+from inside the mininet
+```
+h1 apachectl -k restart
+```
+
 ## Configure Mininet (set OpenFlow13 protocol and add port to switch s1 for snort)
 
 
