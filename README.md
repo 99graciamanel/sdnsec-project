@@ -2,7 +2,15 @@
 
 ## Installation
 
+```
 sudo apt-get install mininet -y
+```
+
+```
+pip3 install ryu && \
+pip3 uninstall eventlet && \
+sudo pip3 install eventlet==0.30.2
+```
 
 ## Configs
 
@@ -40,11 +48,6 @@ Crec que s'hauria de fer `sudo ovs-vsctl set Bridge s1 protocols=OpenFlow13` per
 sudo ovs-vsctl add-port s1 s1-snort && \
 sudo ovs-ofctl show s1
 ```
-
-## Types of RYU applications
-* **simple_switch_rest.py**
-* **simple_switch_controller.py**
-* **rest_firewall_api.py**
 
 ## Run RYU application
 
