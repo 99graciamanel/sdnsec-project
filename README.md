@@ -27,14 +27,14 @@ sudo ip link set s1-snort up
 sudo mn -c && \
 sudo mn --topo single,3 --mac --controller remote --switch ovsk
 ```
-## Configure Mininet (set OpenFlow13 protocol and add port to switch s1 for snort). Then run SNORT
+## Configure Mininet (set OpenFlow13 protocol and add port to switch s1 for snort)
 
 
 Crec que s'hauria de fer `sudo ovs-vsctl set Bridge s1 protocols=OpenFlow13` però aleshores no funciona lo altre...
+
 ```
 sudo ovs-vsctl add-port s1 s1-snort && \
-sudo ovs-ofctl show s1 && \
-sudo snort -i s1-snort -A unsock -l /tmp -c /etc/snort/snort.conf
+sudo ovs-ofctl show s1
 ```
 
 ## Run RYU application
@@ -49,6 +49,12 @@ sudo ryu-manager ryu/ryu/app/simple_switch_snort.py ryu/ryu/app/simple_monitor_1
 sudo ryu-manager ryu/ryu/app/simple_switch_snort.py ryu/ryu/app/simple_monitor_13.py
 ```
 
+## Run SNORT
+
+```
+sudo snort -i s1-snort -A unsock -l /tmp -c /etc/snort/snort.conf
+```
+
 ## Influx
 
 ```
@@ -57,4 +63,10 @@ show databases
 use RYU
 show measurements
 select * from test_measurement where time > now() - 60m
+```
+
+## Attack
+
+```
+h1 python3 dos.py h2
 ```
