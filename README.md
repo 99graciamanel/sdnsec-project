@@ -82,10 +82,10 @@ To update/get info from switch using rest:
 curl -X GET http://127.0.0.1:8080/simpleswitch/mactable/0000000000000001
 ```
 * **rest_firewall.py**: enables firewall control of switches through PUT/POST. Thought for 1 switch, what about multiple ones? Check VLAN part for possible solution.
-* **simple_monitor_13.py**:
-* **simple_monitor_13_telegraf.py**:
-* **simple_switch_snort.py**:
-* **SFC.py** (custom):
+* **simple_monitor_13.py**: it herits from SimpleSwitch13, but implements a monitor that periodically issues requests of the switch to collect statistical counters.
+* **simple_monitor_13_telegraf.py**: same as simple monitor but gives info to telegraf.
+* **simple_switch_snort.py**: snort sends data to RYU, which has an event handler to display the alertmsg.
+* **SFC.py** (custom): RYU app for flow routing.
 
 
 ## Run RYU application
