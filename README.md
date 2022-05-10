@@ -73,7 +73,7 @@ To update/get info from switch using rest:
 ```
 curl -X GET http://127.0.0.1:8080/simpleswitch/mactable/0000000000000001
 ```
-* **rest_firewall.py**
+* **rest_firewall.py**: enables firewall control of switches through PUT/POST.
 * **simple_monitor_13.py**:
 * **simple_monitor_13_telegraf.py**:
 * **simple_switch_snort.py**:
