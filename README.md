@@ -90,14 +90,13 @@ curl -X GET http://127.0.0.1:8080/simpleswitch/mactable/0000000000000001
 
 ## Run RYU application
 
-sudo ryu-manager ryu/ryu/app/rest_firewall.py ryu/ryu/app/simple_switch_snort.py simple_monitor_13_telegraf.py
-
-He tret el `ryu/ryu/app/rest_firewall.py` perquè si no no es poden fer proves ??¿?¿¿?¿?¿
-
-sudo ryu-manager ryu/ryu/app/simple_switch_snort.py ryu/ryu/app/simple_monitor_13.py simple_monitor_13_telegraf.py
 
 ```
-sudo ryu-manager ryu/ryu/app/simple_switch_snort.py ryu/ryu/app/simple_monitor_13.py
+sudo ryu-manager ryu/ryu/app/simple_switch_snort.py ryu/ryu/app/rest_firewall.py simple_monitor_13_telegraf.py
+```
+To initialize firewall rules run:
+```
+./ryu/set_up_firewall.sh
 ```
 
 ## Run SNORT
