@@ -1,5 +1,9 @@
 # SDNSec Project
 
+## Installation
+
+sudo apt-get install mininet -y
+
 ## Configs
 
 Copiar el telegraf.conf y ojo amb el /etc/snort/rules/*.rules
