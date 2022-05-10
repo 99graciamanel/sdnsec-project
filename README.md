@@ -8,7 +8,12 @@ wget https://dl.influxdata.com/influxdb/releases/influxdb_1.8.4_amd64.deb && \
 sudo dpkg -i influxdb_1.8.4_amd64.deb && \
 sudo apt-get update && \
 sudo apt-get install -y python3-influxdb && \
-rm influxdb_1.8.4_amd64.deb
+rm influxdb_1.8.4_amd64.deb && \
+wget https://dl.influxdata.com/telegraf/releases/telegraf_1.17.3-1_amd64.deb && \
+sudo dpkg -i telegraf_1.17.3-1_amd64.deb && \
+rm telegraf_1.17.3-1_amd64.deb && \
+sudo mv /etc/telegraf/telegraf.conf /etc/telegraf/telegraf.conf.bup && \
+sudo cp telegraf/telegraf.conf /etc/telegraf/
 ```
 
 ```
