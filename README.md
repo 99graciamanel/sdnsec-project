@@ -3,7 +3,12 @@
 ## Installation
 
 ```
-sudo apt-get install mininet -y
+sudo apt-get install mininet -y && \
+wget https://dl.influxdata.com/influxdb/releases/influxdb_1.8.4_amd64.deb && \
+sudo dpkg -i influxdb_1.8.4_amd64.deb && \
+sudo apt-get update && \
+sudo apt-get install -y python3-influxdb && \
+rm influxdb_1.8.4_amd64.deb
 ```
 
 ```
