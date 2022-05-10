@@ -119,5 +119,8 @@ select * from test_measurement where time > now() - 60m
 ## Attack
 
 ```
-h1 python3 dos.py h2
+h1 python3 attacks/dos.py h2
+```
+```
+h1 python3 attacks/profe/dos.py h2
 ```
