@@ -48,6 +48,13 @@ Crec que s'hauria de fer `sudo ovs-vsctl set Bridge s1 protocols=OpenFlow13` per
 sudo ovs-vsctl add-port s1 s1-snort && \
 sudo ovs-ofctl show s1
 ```
+## Types of RYU applications
+* **simple_switch_rest_13.py**
+* **rest_firewall.py**
+* **simple_monitor_13.py**
+* **simple_monitor_13_telegraf.py**
+* **simple_switch_snort.py**
+
 
 ## Run RYU application
 
