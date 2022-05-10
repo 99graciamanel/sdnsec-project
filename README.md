@@ -64,7 +64,7 @@ sudo ovs-ofctl show s1
 ```
 ## Types of RYU applications
 * **simple_switch_rest_13.py**: extends switch to updates MAC address table using PUT/POST.
-* **rest_firewall.py**: Controller that defines the URL to receive HTTP request and its corresponding method. Works with simple_switch_rest_13.py.
+* **Simple Switch Controller**: Controller that defines the URL to receive HTTP request and its corresponding method. Works with simple_switch_rest_13.py.
 To run RYU:
 ```
 sudo ryu-manager ryu/ryu/app/simple_switch_rest_13.py
@@ -73,7 +73,7 @@ To update/get info from switch using rest:
 ```
 curl -X GET http://127.0.0.1:8080/simpleswitch/mactable/0000000000000001
 ```
-
+* **rest_firewall.py**
 * **simple_monitor_13.py**:
 * **simple_monitor_13_telegraf.py**:
 * **simple_switch_snort.py**:
