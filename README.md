@@ -41,6 +41,11 @@ sudo ovs-vsctl add-port s1 s1-snort && \
 sudo ovs-ofctl show s1
 ```
 
+## Types of RYU applications
+* **simple_switch_rest.py**
+* **simple_switch_controller.py**
+* **rest_firewall_api.py**
+
 ## Run RYU application
 
 sudo ryu-manager ryu/ryu/app/rest_firewall.py ryu/ryu/app/simple_switch_snort.py simple_monitor_13_telegraf.py
