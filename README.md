@@ -88,10 +88,11 @@ exit
 ## Configure apache server
 from outside the mininet
 ```
+sudo apt install apache2
 sudo systemctl stop apache2
 sudo gedit /etc/apache2/apache2.conf
 ```
-add the following line to the document ServiceName 10.0.0.1
+add the following line to the document ServerName 10.0.0.1
 
 from inside the mininet
 ```
