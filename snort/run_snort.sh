@@ -1,0 +1,1 @@
+sudo snort -i s1-snort -A unsock -l /tmp -c /etc/snort/snort.conf

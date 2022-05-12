@@ -13,7 +13,7 @@
     <option name="ADD_SOURCE_ROOTS" value="true" />
     <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
     <option name="SCRIPT_NAME" value="$PROJECT_DIR$/venv/bin/ryu-manager" />
-    <option name="PARAMETERS" value="ryu/ryu/app/project.py ryu/ryu/app/simple_monitor_13_telegraf.py" />
+    <option name="PARAMETERS" value="ryu/ryu/app/project.py ryu/ryu/app/rest_firewall.py ryu/ryu/app/simple_monitor_13_telegraf.py" />
     <option name="SHOW_COMMAND_LINE" value="false" />
     <option name="EMULATE_TERMINAL" value="false" />
     <option name="MODULE_MODE" value="false" />
