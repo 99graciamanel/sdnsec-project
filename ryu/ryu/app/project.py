@@ -10,6 +10,7 @@ import requests
 
 
 class Project(SimpleSwitchSnort):
+    ICMP_FLOOD = "0"
 
     def __init__(self, *args, **kwargs):
         super(Project, self).__init__(*args, **kwargs)
@@ -31,11 +32,16 @@ class Project(SimpleSwitchSnort):
 
     def fw_deny(self, src, dst, proto):
         url = 'http://localhost:8080/firewall/rules/0000000000000001'
-        data = {"nw_src": "%s/32", "nw_dst": "%s/32", "nw_proto": "%s", "actions": "DENY", "priority": "10"} \
-               % (src, dst, proto)
-
-        x = requests.post(url, data=data)
-        self.logger.info(x.text)
+        data = {
+            "nw_src": "%s" % src,
+            "nw_dst": "%s" % dst,
+            "nw_proto": "%s" % proto,
+            "actions": "DENY",
+            "priority": "10"
+        }
+        self.logger.info(data)
+        response = requests.post(url, data=data)
+        self.logger.info(response.text)
 
     def print_packet_data(self, pkt):
         _eth = pkt.get_protocol(ethernet.ethernet)
