@@ -105,7 +105,6 @@ h1 apachectl -k restart
 Crec que s'hauria de fer `sudo ovs-vsctl set Bridge s1 protocols=OpenFlow13` però aleshores no funciona lo altre...
 
 ```
-sudo ovs-vsctl set Bridge s1 protocols=OpenFlow13 && \
 sudo ovs-vsctl add-port s1 s1-snort && \
 sudo ovs-ofctl show s1
 ```
