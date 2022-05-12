@@ -37,10 +37,10 @@ if __name__ == "__main__":
 	if len(sys.argv) != 2:
 		print(get_str_time() + ERROR_BAD_ARGV_FROM_USER + '\n\n\t Usage: python3 ' + sys.argv[0] + ' <Destination IP>')
 		exit(-1)
-	
+
 	# Initialize status variables
 	time_init = datetime.datetime.now()
-	
+
 	# Tell the user how he/she can stop the attack
 	print(INFO_INIT_1 + sys.argv[1] + ' ' + INFO_INIT_2)
 	os.system('sleep ' + str(INIT_WAIT))

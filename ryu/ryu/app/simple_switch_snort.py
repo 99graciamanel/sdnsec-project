@@ -26,8 +26,8 @@ from ryu.lib.packet import packet
 from ryu.lib.packet import ethernet
 from ryu.lib.packet import ipv4
 from ryu.lib.packet import icmp
+from ryu.lib.packet import tcp
 from ryu.lib import snortlib
-
 
 class SimpleSwitchSnort(app_manager.RyuApp):
     OFP_VERSIONS = [ofproto_v1_3.OFP_VERSION]
@@ -43,6 +43,16 @@ class SimpleSwitchSnort(app_manager.RyuApp):
 
         self.snort.set_config(socket_config)
         self.snort.start_socket_server()
+
+    @set_ev_cls(snortlib.EventAlert, MAIN_DISPATCHER)
+    def _dump_alert(self, ev):
+        msg = ev.msg
+        print('alertmsg: %s' % msg.alertmsg[0].decode())
+
+        pkt = packet.Packet(array.array('B', msg.pkt))
+        self.print_packet_data(pkt)
+
+        self.packet_print(msg.pkt)
 
     def packet_print(self, pkt):
         pkt = packet.Packet(array.array('B', pkt))
@@ -64,15 +74,6 @@ class SimpleSwitchSnort(app_manager.RyuApp):
         #     if hasattr(p, 'protocol_name') is False:
         #         break
         #     print('p: %s' % p.protocol_name)
-
-    @set_ev_cls(snortlib.EventAlert, MAIN_DISPATCHER)
-    def _dump_alert(self, ev):
-        msg = ev.msg
-
-	# Execute our own code here!
-        print('alertmsg: %s' % msg.alertmsg[0].decode())
-
-        self.packet_print(msg.pkt)
 
     @set_ev_cls(ofp_event.EventOFPSwitchFeatures, CONFIG_DISPATCHER)
     def switch_features_handler(self, ev):
