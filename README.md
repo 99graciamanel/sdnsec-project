@@ -62,6 +62,29 @@ sudo mn -c && \
 sudo mn --topo single,3 --mac --controller remote --switch ovsk
 ```
 
+## Give internet acces to h1
+```
+sudo mn --custom myTopo.py --topo=mytopo
+sudo ifconfig s1 up
+sudo ovs-vsctl add-port s1 enp0s3
+sudo ifconfig enp0s3 0
+sudo dhclient s1 
+```
+Mininet:
+```
+xterm h1
+ifconfig h1-eth0 0
+dhclient h1-eth0 
+nano /etc/resolv.conf //change the nameserver to 8.8.8.8
+exit
+```
+```
+xterm h2
+ifconfig h2-eth0 0
+dhclient h2-eth0 
+exit
+```
+
 ## Configure apache server
 from outside the mininet
 ```
