@@ -62,6 +62,11 @@ sudo mn -c && \
 sudo mn --topo single,3 --mac --controller remote --switch ovsk
 ```
 
+```
+sudo mn -c && \
+sudo mn --custom topo/myTopo.py --topo=mytopo
+```
+
 ## Give internet acces to h1
 ```
 sudo mn --custom myTopo.py --topo=mytopo

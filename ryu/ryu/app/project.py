@@ -31,13 +31,13 @@ class Project(SimpleSwitchSnort):
 
     def fw_deny(self, src, dst, proto):
         self.logger.info(
-            "curl -X POST -d '{\"nw_src\": \"%s/32\", \"nw_dst\": \"%s/32\", \"nw_proto\": \"%s\", \"actions\":\"DENY\", \"priority\": \"10\"}' http://localhost:8080/firewall/rules/0000000000000001" % (
+            "curl -X POST -d '{\"nw_src\": \"%s/32\", \"nw_dst\": \"%s/32\", \"nw_proto\": \"%s\", \"actions\":\"DENY\", \"priority\": \"10\"}' http://localhost:8080/firewall/rules/0000000000000002" % (
             src, dst, proto))
         os.system(
-            "curl -X POST -d '{\"nw_src\": \"%s/32\", \"nw_dst\": \"%s/32\", \"nw_proto\": \"%s\", \"actions\":\"DENY\", \"priority\": \"10\"}' http://localhost:8080/firewall/rules/0000000000000001" % (
+            "curl -X POST -d '{\"nw_src\": \"%s/32\", \"nw_dst\": \"%s/32\", \"nw_proto\": \"%s\", \"actions\":\"DENY\", \"priority\": \"10\"}' http://localhost:8080/firewall/rules/0000000000000002" % (
             src, dst, proto))
 
-        url = 'http://localhost:8080/firewall/rules/0000000000000001'
+        url = 'http://localhost:8080/firewall/rules/0000000000000002'
         data = {
             "nw_src": "%s" % src,
             "nw_dst": "%s" % dst,
