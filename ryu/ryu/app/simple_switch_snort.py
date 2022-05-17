@@ -50,7 +50,7 @@ class SimpleSwitchSnort(app_manager.RyuApp):
         print('alertmsg: %s' % msg.alertmsg[0].decode())
 
         pkt = packet.Packet(array.array('B', msg.pkt))
-        self.print_packet_data(pkt)
+        #self.print_packet_data(pkt)
 
         self.packet_print(msg.pkt)
 
