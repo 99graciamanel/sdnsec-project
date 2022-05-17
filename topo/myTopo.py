@@ -34,9 +34,6 @@ class MyTopo(Topo):
         self.addLink(s1, s2)
         self.addLink(s1, s3)
         self.addLink(s1, s4)
-        self.addLink(s2, s3)
-        self.addLink(s2, s4)
-
 
 # Adding the 'topos' dict with a key/value pair to
 # generate our newly defined topology enables one
