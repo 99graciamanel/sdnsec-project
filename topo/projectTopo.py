@@ -2,7 +2,7 @@
 from mininet.topo import Topo
 
 
-class MyTopo(Topo):
+class ProjectTopo(Topo):
     def __init__(self):
         # Initialize topology
         Topo.__init__(self)
@@ -30,4 +30,4 @@ class MyTopo(Topo):
 # Adding the 'topos' dict with a key/value pair to
 # generate our newly defined topology enables one
 # to pass in '--topo=mytopo' from the command line.
-topos = {'mytopo': (lambda: MyTopo())}
+topos = {'projectTopo': (lambda: ProjectTopo())}

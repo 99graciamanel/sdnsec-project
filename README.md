@@ -117,10 +117,13 @@ sudo ip link set s1-snort up
 
 ```
 sudo mn -c && \
-sudo mn --topo single,3 --mac --controller remote --switch ovsk
+sudo mn --custom topo/myTopo.py --topo=mytopo
 ```
 
+## Give internet acces to h1
+=======
 ### Give internet acces to h1
+>>>>>>> main
 ```
 sudo mn --custom myTopo.py --topo=mytopo
 sudo ifconfig s1 up
