@@ -20,6 +20,7 @@ class MyTopo(Topo):
         self.addLink(h_lan, s2)
         self.addLink(h_dmz, s1)
         self.addLink(h_hp, s1)
+        self.addLink(h_dmz, s2)
 
         # Add (bidirectional) links between switches
         self.addLink(s1, s2)
