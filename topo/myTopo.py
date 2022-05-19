@@ -11,6 +11,7 @@ class MyTopo(Topo):
         h_dmz = self.addHost('h_dmz')
         h_hp = self.addHost('h_hp')
         h_lan = self.addHost('h_lan')
+        h_lan2 = self.addHost('h_lan2')
 
         s1 = self.addSwitch('s1')
         s2 = self.addSwitch('s2')
@@ -21,6 +22,7 @@ class MyTopo(Topo):
         self.addLink(h_dmz, s1)
         self.addLink(h_hp, s1)
         self.addLink(h_dmz, s2)
+        self.addLink(h_lan2, s2)
 
         # Add (bidirectional) links between switches
         self.addLink(s1, s2)
