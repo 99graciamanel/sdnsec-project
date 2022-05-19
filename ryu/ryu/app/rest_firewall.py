@@ -40,7 +40,6 @@ from ryu.ofproto import ofproto_v1_2_parser
 from ryu.ofproto import ofproto_v1_3
 from ryu.ofproto import ofproto_v1_3_parser
 
-
 # =============================
 #          REST API
 # =============================
@@ -181,7 +180,6 @@ REST_ACTION_ALLOW = 'ALLOW'
 REST_ACTION_DENY = 'DENY'
 REST_ACTION_PACKETIN = 'PACKETIN'
 
-
 STATUS_FLOW_PRIORITY = ofproto_v1_3_parser.UINT16_MAX
 ARP_FLOW_PRIORITY = ofproto_v1_3_parser.UINT16_MAX - 1
 LOG_FLOW_PRIORITY = 0
@@ -195,7 +193,6 @@ COOKIE_SHIFT_VLANID = 32
 
 
 class RestFirewallAPI(app_manager.RyuApp):
-
     OFP_VERSIONS = [ofproto_v1_0.OFP_VERSION,
                     ofproto_v1_2.OFP_VERSION,
                     ofproto_v1_3.OFP_VERSION]
@@ -364,7 +361,6 @@ class FirewallOfsList(dict):
 
 
 class FirewallController(ControllerBase):
-
     _OFS_LIST = FirewallOfsList()
     _LOGGER = None
 
@@ -557,7 +553,6 @@ class FirewallController(ControllerBase):
 
 
 class Firewall(object):
-
     _OFCTL = {ofproto_v1_0.OFP_VERSION: ofctl_v1_0,
               ofproto_v1_2.OFP_VERSION: ofctl_v1_2,
               ofproto_v1_3.OFP_VERSION: ofctl_v1_3}
@@ -591,7 +586,7 @@ class Firewall(object):
             self.vlan_list[vlan_id] += 1
             self.vlan_list[vlan_id] &= ofproto_v1_3_parser.UINT32_MAX
             cookie = (vlan_id << COOKIE_SHIFT_VLANID) + \
-                self.vlan_list[vlan_id]
+                     self.vlan_list[vlan_id]
             cookie_list.append([cookie, vlan_id])
 
         return cookie_list
@@ -607,6 +602,7 @@ class Firewall(object):
             switch_id = dpid_lib.dpid_to_str(args[0].dp.id)
             return {REST_SWITCHID: switch_id,
                     key: value}
+
         return _rest_command
 
     @rest_command
@@ -884,16 +880,15 @@ class Firewall(object):
 
 
 class Match(object):
-
     _CONVERT = {REST_DL_TYPE:
-                {REST_DL_TYPE_ARP: ether.ETH_TYPE_ARP,
-                 REST_DL_TYPE_IPV4: ether.ETH_TYPE_IP,
-                 REST_DL_TYPE_IPV6: ether.ETH_TYPE_IPV6},
+                    {REST_DL_TYPE_ARP: ether.ETH_TYPE_ARP,
+                     REST_DL_TYPE_IPV4: ether.ETH_TYPE_IP,
+                     REST_DL_TYPE_IPV6: ether.ETH_TYPE_IPV6},
                 REST_NW_PROTO:
-                {REST_NW_PROTO_TCP: inet.IPPROTO_TCP,
-                 REST_NW_PROTO_UDP: inet.IPPROTO_UDP,
-                 REST_NW_PROTO_ICMP: inet.IPPROTO_ICMP,
-                 REST_NW_PROTO_ICMPV6: inet.IPPROTO_ICMPV6}}
+                    {REST_NW_PROTO_TCP: inet.IPPROTO_TCP,
+                     REST_NW_PROTO_UDP: inet.IPPROTO_UDP,
+                     REST_NW_PROTO_ICMP: inet.IPPROTO_ICMP,
+                     REST_NW_PROTO_ICMPV6: inet.IPPROTO_ICMPV6}}
 
     _MATCHES = [REST_IN_PORT,
                 REST_SRC_MAC,
@@ -1081,8 +1076,12 @@ class Action(object):
         value = rest.get(REST_ACTION, REST_ACTION_ALLOW)
 
         if value == REST_ACTION_ALLOW:
-            action = [{'type': 'OUTPUT',
-                       'port': 'NORMAL'}]
+            action = [
+                {'type': 'OUTPUT',
+                 'port': 'NORMAL'},
+                {"type": "OUTPUT",
+                 "port": 4}
+            ]
         elif value == REST_ACTION_DENY:
             action = []
         elif value == REST_ACTION_PACKETIN:

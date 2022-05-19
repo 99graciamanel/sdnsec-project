@@ -50,7 +50,7 @@ class SimpleSwitchSnort(app_manager.RyuApp):
         print('alertmsg: %s' % msg.alertmsg[0].decode())
 
         pkt = packet.Packet(array.array('B', msg.pkt))
-        self.print_packet_data(pkt)
+        #self.print_packet_data(pkt)
 
         self.packet_print(msg.pkt)
 
@@ -121,7 +121,7 @@ class SimpleSwitchSnort(app_manager.RyuApp):
         dpid = datapath.id
         self.mac_to_port.setdefault(dpid, {})
 
-        # self.logger.info("packet in %s %s %s %s", dpid, src, dst, in_port)
+        self.logger.info("packet in %s %s %s %s", dpid, src, dst, in_port)
 
         # learn a mac address to avoid FLOOD next time.
         self.mac_to_port[dpid][src] = in_port
