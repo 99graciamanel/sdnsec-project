@@ -23,7 +23,7 @@ sudo mn -c && \
 sudo mn --custom myTopo.py --topo=mytopo
 ```
 
-### Step 2: Connect s
+### Step 2: Connect switch ports
 
 ```
 sudo ovs-vsctl add-port s1 s1-snort && \
