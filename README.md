@@ -29,7 +29,7 @@ sudo mn --custom myTopo.py --topo=mytopo
 sudo ovs-vsctl add-port s1 s1-snort && \
 sudo ovs-ofctl show s1 && \
 sudo ovs-vsctl add-port s2 s2-snort && \
-sudo ovs-ofctl show s2 && \
+sudo ovs-ofctl show s2
 ```
 
 ### Step 3: Run Snort 1
