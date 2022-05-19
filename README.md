@@ -136,6 +136,10 @@ To initialize firewall rules run:
 ```
 ./ryu/set_up_firewall.sh
 ```
+To set up switch rules:
+```
+curl -X POST -d '{"dpid": 1, "table_id": 0, "priority": 1, "match": {"in_port": 1, "dl_dst": "00:00:00:00:00:02"}, "actions": [{"type":"OUTPUT", "port": 2}, {"type": "OUTPUT", "port": 4}]}' http://localhost:8080/stats/flowentry/add
+```
 
 ## Run SNORT
 
