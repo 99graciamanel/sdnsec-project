@@ -381,6 +381,7 @@ class FirewallController(ControllerBase):
     @staticmethod
     def regist_ofs(dp):
         dpid_str = dpid_lib.dpid_to_str(dp.id)
+        
         try:
             f_ofs = Firewall(dp)
         except OFPUnknownVersion as message:
@@ -1080,7 +1081,7 @@ class Action(object):
                 {'type': 'OUTPUT',
                  'port': 'NORMAL'},
                 {"type": "OUTPUT",
-                 "port": 4}
+                 "port": 5}
             ]
         elif value == REST_ACTION_DENY:
             action = []
