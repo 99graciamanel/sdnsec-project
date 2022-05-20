@@ -20,7 +20,7 @@ sudo ip link set s2-snort up
 
 ```
 sudo mn -c && \
-sudo mn --custom myTopo.py --topo=mytopo
+sudo mn --custom topo/projectTopo.py --topo=projectTopo
 ```
 
 ### Step 2: Connect switch ports
@@ -35,7 +35,7 @@ sudo ovs-ofctl show s2
 ### Step 3: Run Snort 1
 
 ```
-sudo snort -i s1-snort -A unsock -l /tmp/snort_s1 -c /etc/snort/snort_s2.conf
+sudo snort -i s1-snort -A unsock -l /tmp/snort_s1 -c /etc/snort/snort_s1.conf
 ```
 
 ### Step 4: Run Snort 2
