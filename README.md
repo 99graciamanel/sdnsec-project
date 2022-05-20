@@ -20,7 +20,7 @@ sudo ip link set s2-snort up
 
 ```
 sudo mn -c && \
-sudo mn --custom topo/projectTopo.py --topo=projectTopo
+sudo mn --custom topo/projectTopo.py --mac --controller remote --topo=projectTopo
 ```
 
 ### Step 2: Connect switch ports
