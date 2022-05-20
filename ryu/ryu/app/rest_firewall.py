@@ -1080,7 +1080,7 @@ class Action(object):
                 {'type': 'OUTPUT',
                  'port': 'NORMAL'},
                 {"type": "OUTPUT",
-                 "port": 4}
+                 "port": 5}
             ]
         elif value == REST_ACTION_DENY:
             action = []

