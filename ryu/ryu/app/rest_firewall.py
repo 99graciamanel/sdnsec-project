@@ -381,6 +381,7 @@ class FirewallController(ControllerBase):
     @staticmethod
     def regist_ofs(dp):
         dpid_str = dpid_lib.dpid_to_str(dp.id)
+        
         try:
             f_ofs = Firewall(dp)
         except OFPUnknownVersion as message:
