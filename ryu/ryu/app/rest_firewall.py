@@ -477,12 +477,10 @@ class FirewallController(ControllerBase):
             vid = FirewallController._conv_toint_vlanid(vlan_id)
         except ValueError as message:
             return Response(status=400, body=str(message))
-
         msgs = []
         for f_ofs in dps.values():
             rules = f_ofs.get_rules(self.waiters, vid)
             msgs.append(rules)
-
         body = json.dumps(msgs)
         return Response(content_type='application/json', body=body)
 

@@ -52,7 +52,7 @@ class SimpleSwitchSnort(app_manager.RyuApp):
         pkt = packet.Packet(array.array('B', msg.pkt))
         #self.print_packet_data(pkt)
 
-        self.packet_print(msg.pkt)
+        #self.packet_print(msg.pkt)
 
     def packet_print(self, pkt):
         pkt = packet.Packet(array.array('B', pkt))

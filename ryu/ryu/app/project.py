@@ -10,7 +10,7 @@ from ryu.controller import ofp_event
 from simple_switch_snort import SimpleSwitchSnort
 
 import requests
-
+import json
 
 class Project(SimpleSwitchSnort):
     ICMP_FLOOD = "0"
@@ -65,18 +65,57 @@ class Project(SimpleSwitchSnort):
     @set_ev_cls(snortlib.EventAlert, MAIN_DISPATCHER)
     def _dump_alert(self, ev):
         msg = ev.msg
-        self.logger.info('alertmsg: %s' % msg.alertmsg[0].decode())
+        
+        #self.logger.info('alertmsg: %s' % msg.alertmsg[0].decode())
         pkt = packet.Packet(array.array('B', msg.pkt))
-        self.print_packet_data(pkt)
+        
+        #self.print_packet_data(pkt)
         # if pkt.get_protocol(icmp.icmp):
-        self.fw_block_icmp(pkt)
+        
+        alert_msg = int(msg.alertmsg[0].decode()[0:3])
+        
+        sw_id = "0"
+        proto = ""
+        if alert_msg == 101:
+            sw_id = "1"
+            proto = "ICMP"
+        elif alert_msg == 102:
+            sw_id = "1"
+            proto = "TCP"
+        elif alert_msg == 201:
+            sw_id = "2"
+            proto = "ICMP"
+        elif alert_msg == 202:
+            sw_id = "2"
+            proto = "TCP"
+        else:
+            print(alert_msg)
+            return
+        self.fw_block(pkt, proto, sw_id)
 
-    def fw_block_icmp(self, pkt):
+    def fw_block(self, pkt, proto, sw_id):
         _ipv4 = pkt.get_protocol(ipv4.ipv4)
-        self.fw_deny(_ipv4.src, _ipv4.dst, "ICMP")
-
-    def fw_deny(self, src, dst, proto):
-        url = 'http://localhost:8080/firewall/rules/0000000000000001'
+        
+        if self.fw_check(_ipv4.src, _ipv4.dst, proto, sw_id):
+            self.fw_deny(_ipv4.src, _ipv4.dst, proto, sw_id)
+    
+    
+    def fw_check(self, nw_src, nw_dst, nw_proto, sw_id):
+        priority = 10
+        
+        url = 'http://localhost:8080/firewall/rules/000000000000000'+sw_id
+        response = requests.get(url)        
+        data = response.text
+        data_json = json.loads(data)
+        
+        for json_rule in data_json[0].get('access_control_list')[0].get('rules'):
+            if nw_src == json_rule.get('nw_src') and nw_dst == json_rule.get('nw_dst') and priority == json_rule.get('priority') and nw_proto == json_rule.get('nw_proto'):
+                return False
+        return True
+    
+    
+    def fw_deny(self, src, dst, proto, sw_id):
+        url = 'http://localhost:8080/firewall/rules/000000000000000'+sw_id
         data = {
             "nw_src": "%s" % src,
             "nw_dst": "%s" % dst,
@@ -85,10 +124,12 @@ class Project(SimpleSwitchSnort):
             "priority": "10"
         }
 
-        self.logger.info(data)
+        #self.logger.info(data)
         response = requests.post(url, json=data)
-        self.logger.info(response.text)
-
+        #self.logger.info(response.text)
+    
+    
+    
     def print_packet_data(self, pkt):
         _eth = pkt.get_protocol(ethernet.ethernet)
         _arp = pkt.get_protocol(arp.arp)
