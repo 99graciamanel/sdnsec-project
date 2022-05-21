@@ -84,6 +84,7 @@ class Project(SimpleSwitchSnort):
             "actions": "DENY",
             "priority": "10"
         }
+
         self.logger.info(data)
         response = requests.post(url, json=data)
         self.logger.info(response.text)
