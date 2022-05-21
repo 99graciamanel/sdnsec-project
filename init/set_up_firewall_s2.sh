@@ -50,3 +50,5 @@ curl -X POST -d '{"nw_src": "10.0.0.5/32", "nw_dst": "10.0.0.3/32"}' http://loca
 echo
 curl -X POST -d '{"nw_src": "10.0.0.5/32", "nw_dst": "10.0.0.4/32"}' http://localhost:8080/firewall/rules/0000000000000002
 echo
+
+curl http://localhost:8080/firewall/rules/0000000000000002
