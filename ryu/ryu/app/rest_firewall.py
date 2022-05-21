@@ -745,10 +745,10 @@ class Firewall(object):
             rest[REST_DL_VLAN] = vlan_id
 
         match = Match.to_openflow(rest)
-        if rest.get(REST_ACTION) == REST_ACTION_DENY:
-            result = self.get_log_status(waiters)
-            if result[REST_LOG_STATUS] == REST_STATUS_ENABLE:
-                rest[REST_ACTION] = REST_ACTION_PACKETIN
+        # if rest.get(REST_ACTION) == REST_ACTION_DENY:
+        #     result = self.get_log_status(waiters)
+        #     if result[REST_LOG_STATUS] == REST_STATUS_ENABLE:
+        #         rest[REST_ACTION] = REST_ACTION_PACKETIN
         actions = Action.to_openflow(rest)
         flow = self._to_of_flow(cookie=cookie, priority=priority,
                                 match=match, actions=actions)
