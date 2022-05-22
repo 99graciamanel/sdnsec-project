@@ -16,8 +16,23 @@
   "gnetId": null,
   "graphTooltip": 0,
   "id": 1,
+  "iteration": 1653246745738,
   "links": [],
   "panels": [
+    {
+      "collapsed": false,
+      "datasource": null,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 17,
+      "panels": [],
+      "title": "Blocked packets per source IP",
+      "type": "row"
+    },
     {
       "datasource": null,
       "fieldConfig": {
@@ -26,12 +41,1433 @@
             "mode": "palette-classic"
           },
           "custom": {
-            "axisLabel": "Total payload length (bytes)",
+            "axisLabel": "Number of packets",
             "axisPlacement": "auto",
             "barAlignment": 0,
             "drawStyle": "line",
-            "fillOpacity": 100,
+            "fillOpacity": 10,
+            "gradientMode": "opacity",
+            "hideFrom": {
+              "graph": false,
+              "legend": false,
+              "tooltip": false
+            },
+            "lineInterpolation": "smooth",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": true
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": [
+          {
+            "__systemRef": "hideSeriesFrom",
+            "matcher": {
+              "id": "byNames",
+              "options": {
+                "mode": "exclude",
+                "names": [
+                  "IPv4 at Switch 10.0.0.3"
+                ],
+                "prefix": "All except:",
+                "readOnly": true
+              }
+            },
+            "properties": [
+              {
+                "id": "custom.hideFrom",
+                "value": {
+                  "graph": false,
+                  "legend": false,
+                  "tooltip": false
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 24,
+        "x": 0,
+        "y": 1
+      },
+      "id": 14,
+      "options": {
+        "graph": {},
+        "legend": {
+          "calcs": [
+            "sum",
+            "max"
+          ],
+          "displayMode": "table",
+          "placement": "bottom"
+        },
+        "tooltipOptions": {
+          "mode": "single"
+        }
+      },
+      "pluginVersion": "7.4.3",
+      "repeat": "ips",
+      "repeatDirection": "v",
+      "scopedVars": {
+        "ips": {
+          "selected": true,
+          "text": "10.0.0.4",
+          "value": "10.0.0.4"
+        }
+      },
+      "targets": [
+        {
+          "alias": "IPv4 at IP $ips",
+          "groupBy": [
+            {
+              "params": [
+                "$__interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "0"
+              ],
+              "type": "fill"
+            }
+          ],
+          "hide": false,
+          "measurement": "blocked",
+          "orderByTime": "ASC",
+          "policy": "default",
+          "query": "SELECT cumulative_sum(count(\"payload\")) FROM \"redirected\" WHERE (\"ip_src\" in '[$ips]') AND $timeFilter GROUP BY time($__interval) fill(0)",
+          "rawQuery": false,
+          "refId": "IPv4 at Switch 2",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "payload"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "count"
+              },
+              {
+                "params": [],
+                "type": "cumulative_sum"
+              }
+            ]
+          ],
+          "tags": [
+            {
+              "key": "ip_src",
+              "operator": "=",
+              "value": "$ips"
+            }
+          ]
+        }
+      ],
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "Blocked per Source IP=$ips",
+      "transformations": [],
+      "type": "timeseries"
+    },
+    {
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {},
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": []
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 24,
+        "x": 0,
+        "y": 8
+      },
+      "id": 19,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "text": {},
+        "textMode": "auto"
+      },
+      "pluginVersion": "7.4.3",
+      "repeat": "ips",
+      "repeatDirection": "h",
+      "scopedVars": {
+        "ips": {
+          "selected": true,
+          "text": "10.0.0.4",
+          "value": "10.0.0.4"
+        }
+      },
+      "targets": [
+        {
+          "alias": "IPv4 at IP $ips",
+          "groupBy": [
+            {
+              "params": [
+                "$__interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "none"
+              ],
+              "type": "fill"
+            }
+          ],
+          "hide": false,
+          "measurement": "blocked",
+          "orderByTime": "ASC",
+          "policy": "default",
+          "query": "SELECT cumulative_sum(count(\"payload\")) FROM \"redirected\" WHERE (\"ip_src\" in '[$ips]') AND $timeFilter GROUP BY time($__interval) fill(0)",
+          "rawQuery": false,
+          "refId": "IPv4 at Switch 2",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "payload"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "count"
+              },
+              {
+                "params": [],
+                "type": "cumulative_sum"
+              }
+            ]
+          ],
+          "tags": [
+            {
+              "key": "ip_src",
+              "operator": "=",
+              "value": "$ips"
+            }
+          ]
+        }
+      ],
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "Blocked per Source IP=$ips",
+      "transformations": [],
+      "type": "stat"
+    },
+    {
+      "collapsed": false,
+      "datasource": null,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 15
+      },
+      "id": 5,
+      "panels": [],
+      "title": "Dashboard",
+      "type": "row"
+    },
+    {
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {},
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 8,
+        "x": 8,
+        "y": 16
+      },
+      "id": 12,
+      "options": {
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true,
+        "text": {}
+      },
+      "pluginVersion": "7.4.3",
+      "targets": [
+        {
+          "alias": "UDP",
+          "groupBy": [
+            {
+              "params": [
+                "$__interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "0"
+              ],
+              "type": "fill"
+            }
+          ],
+          "measurement": "blocked",
+          "orderByTime": "ASC",
+          "policy": "default",
+          "refId": "UDP",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "payload"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [
+                  3
+                ],
+                "type": "top"
+              }
+            ]
+          ],
+          "tags": [
+            {
+              "key": "proto",
+              "operator": "=",
+              "value": "udp"
+            }
+          ]
+        },
+        {
+          "alias": "TCP",
+          "groupBy": [
+            {
+              "params": [
+                "$__interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "0"
+              ],
+              "type": "fill"
+            }
+          ],
+          "hide": false,
+          "measurement": "blocked",
+          "orderByTime": "ASC",
+          "policy": "default",
+          "refId": "TCP",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "payload"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [
+                  3
+                ],
+                "type": "top"
+              }
+            ]
+          ],
+          "tags": [
+            {
+              "key": "proto",
+              "operator": "=",
+              "value": "tcp"
+            }
+          ]
+        },
+        {
+          "alias": "ICMP v4",
+          "groupBy": [
+            {
+              "params": [
+                "$__interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "0"
+              ],
+              "type": "fill"
+            }
+          ],
+          "hide": false,
+          "measurement": "blocked",
+          "orderByTime": "ASC",
+          "policy": "default",
+          "refId": "ICMP v4",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "payload"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [
+                  3
+                ],
+                "type": "top"
+              }
+            ]
+          ],
+          "tags": [
+            {
+              "key": "proto",
+              "operator": "=",
+              "value": "icmp"
+            }
+          ]
+        },
+        {
+          "alias": "ICMP v6",
+          "groupBy": [
+            {
+              "params": [
+                "$__interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "0"
+              ],
+              "type": "fill"
+            }
+          ],
+          "hide": false,
+          "measurement": "blocked",
+          "orderByTime": "ASC",
+          "policy": "default",
+          "refId": "ICMP v6",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "payload"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [
+                  3
+                ],
+                "type": "top"
+              }
+            ]
+          ],
+          "tags": [
+            {
+              "key": "proto",
+              "operator": "=",
+              "value": "icmpv6"
+            }
+          ]
+        }
+      ],
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "Most common Payload length by protocol",
+      "transformations": [
+        {
+          "id": "groupBy",
+          "options": {
+            "fields": {
+              "ICMP v4": {
+                "aggregations": [
+                  "sum"
+                ],
+                "operation": "aggregate"
+              },
+              "ICMP v6": {
+                "aggregations": [
+                  "sum"
+                ],
+                "operation": "aggregate"
+              },
+              "Time": {
+                "aggregations": [],
+                "operation": "aggregate"
+              },
+              "UDP": {
+                "aggregations": [
+                  "sum"
+                ],
+                "operation": "aggregate"
+              },
+              "Value": {
+                "aggregations": [],
+                "operation": "aggregate"
+              }
+            }
+          }
+        }
+      ],
+      "type": "gauge"
+    },
+    {
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 10,
             "gradientMode": "none",
+            "hideFrom": {
+              "graph": false,
+              "legend": false,
+              "tooltip": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": true
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 13,
+        "w": 21,
+        "x": 1,
+        "y": 20
+      },
+      "id": 9,
+      "options": {
+        "graph": {},
+        "legend": {
+          "calcs": [
+            "sum"
+          ],
+          "displayMode": "table",
+          "placement": "bottom"
+        },
+        "tooltipOptions": {
+          "mode": "single"
+        }
+      },
+      "pluginVersion": "7.4.3",
+      "targets": [
+        {
+          "alias": "Redirected packets in Switch 1",
+          "groupBy": [
+            {
+              "params": [
+                "$__interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "null"
+              ],
+              "type": "fill"
+            }
+          ],
+          "measurement": "redirected",
+          "orderByTime": "ASC",
+          "policy": "default",
+          "refId": "A",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "eth_dst"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "count"
+              }
+            ]
+          ],
+          "tags": [
+            {
+              "key": "switch",
+              "operator": "=",
+              "value": "0000000000000001"
+            }
+          ]
+        },
+        {
+          "alias": "Redirected packets in Switch 2",
+          "groupBy": [
+            {
+              "params": [
+                "$__interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "null"
+              ],
+              "type": "fill"
+            }
+          ],
+          "hide": false,
+          "measurement": "redirected",
+          "orderByTime": "ASC",
+          "policy": "default",
+          "refId": "B",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "eth_dst"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "count"
+              }
+            ]
+          ],
+          "tags": [
+            {
+              "key": "switch",
+              "operator": "=",
+              "value": "0000000000000002"
+            }
+          ]
+        }
+      ],
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "Redirected packets to HoneyPot",
+      "type": "timeseries"
+    },
+    {
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisLabel": "Payload length (bytes)",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "opacity",
+            "hideFrom": {
+              "graph": false,
+              "legend": false,
+              "tooltip": false
+            },
+            "lineInterpolation": "smooth",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": true
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 12,
+        "w": 12,
+        "x": 0,
+        "y": 33
+      },
+      "id": 2,
+      "options": {
+        "graph": {},
+        "legend": {
+          "calcs": [
+            "sum",
+            "max"
+          ],
+          "displayMode": "table",
+          "placement": "bottom"
+        },
+        "tooltipOptions": {
+          "mode": "single"
+        }
+      },
+      "pluginVersion": "7.4.3",
+      "targets": [
+        {
+          "alias": "IPv6 at Switch 1",
+          "groupBy": [
+            {
+              "params": [
+                "$__interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "0"
+              ],
+              "type": "fill"
+            }
+          ],
+          "measurement": "blocked",
+          "orderByTime": "ASC",
+          "policy": "default",
+          "refId": "IPv6 Switch 2",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "payload"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "mean"
+              }
+            ]
+          ],
+          "tags": [
+            {
+              "key": "ip_proto",
+              "operator": "=",
+              "value": "ipv6"
+            },
+            {
+              "condition": "AND",
+              "key": "switch",
+              "operator": "=",
+              "value": "0000000000000001"
+            }
+          ]
+        },
+        {
+          "alias": "IPv4 at Switch 1",
+          "groupBy": [
+            {
+              "params": [
+                "$__interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "0"
+              ],
+              "type": "fill"
+            }
+          ],
+          "hide": false,
+          "measurement": "blocked",
+          "orderByTime": "ASC",
+          "policy": "default",
+          "refId": "IPv4 Switch 1",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "payload"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "mean"
+              }
+            ]
+          ],
+          "tags": [
+            {
+              "key": "ip_proto",
+              "operator": "=",
+              "value": "ipv4"
+            },
+            {
+              "condition": "AND",
+              "key": "switch",
+              "operator": "=",
+              "value": "0000000000000001"
+            }
+          ]
+        },
+        {
+          "alias": "IPv6 at Switch 2",
+          "groupBy": [
+            {
+              "params": [
+                "$__interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "0"
+              ],
+              "type": "fill"
+            }
+          ],
+          "hide": false,
+          "measurement": "blocked",
+          "orderByTime": "ASC",
+          "policy": "default",
+          "refId": "IPv6 at Switch 2",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "payload"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "mean"
+              }
+            ]
+          ],
+          "tags": [
+            {
+              "key": "ip_proto",
+              "operator": "=",
+              "value": "ipv6"
+            },
+            {
+              "condition": "AND",
+              "key": "switch",
+              "operator": "=",
+              "value": "0000000000000002"
+            }
+          ]
+        },
+        {
+          "alias": "IPv4 at Switch 2",
+          "groupBy": [
+            {
+              "params": [
+                "$__interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "0"
+              ],
+              "type": "fill"
+            }
+          ],
+          "hide": false,
+          "measurement": "blocked",
+          "orderByTime": "ASC",
+          "policy": "default",
+          "refId": "IPv4 at Switch 2",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "payload"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "mean"
+              }
+            ]
+          ],
+          "tags": [
+            {
+              "key": "ip_proto",
+              "operator": "=",
+              "value": "ipv4"
+            },
+            {
+              "condition": "AND",
+              "key": "switch",
+              "operator": "=",
+              "value": "0000000000000002"
+            }
+          ]
+        }
+      ],
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "Blocked Ipv4 & Ipv6 over time",
+      "transformations": [],
+      "type": "timeseries"
+    },
+    {
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisLabel": "Payload length (bytes)",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 9,
+            "gradientMode": "opacity",
+            "hideFrom": {
+              "graph": false,
+              "legend": false,
+              "tooltip": false
+            },
+            "lineInterpolation": "smooth",
+            "lineStyle": {
+              "fill": "solid"
+            },
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": true
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 12,
+        "w": 12,
+        "x": 12,
+        "y": 33
+      },
+      "id": 3,
+      "options": {
+        "graph": {},
+        "legend": {
+          "calcs": [
+            "sum"
+          ],
+          "displayMode": "table",
+          "placement": "bottom"
+        },
+        "tooltipOptions": {
+          "mode": "single"
+        }
+      },
+      "pluginVersion": "7.4.3",
+      "targets": [
+        {
+          "alias": "UDP",
+          "groupBy": [
+            {
+              "params": [
+                "$__interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "0"
+              ],
+              "type": "fill"
+            }
+          ],
+          "measurement": "blocked",
+          "orderByTime": "ASC",
+          "policy": "default",
+          "refId": "UDP",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "payload"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "mean"
+              }
+            ]
+          ],
+          "tags": [
+            {
+              "key": "proto",
+              "operator": "=",
+              "value": "udp"
+            }
+          ]
+        },
+        {
+          "alias": "TCP",
+          "groupBy": [
+            {
+              "params": [
+                "$__interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "0"
+              ],
+              "type": "fill"
+            }
+          ],
+          "hide": false,
+          "measurement": "blocked",
+          "orderByTime": "ASC",
+          "policy": "default",
+          "refId": "TCP",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "payload"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "mean"
+              }
+            ]
+          ],
+          "tags": [
+            {
+              "key": "proto",
+              "operator": "=",
+              "value": "tcp"
+            }
+          ]
+        },
+        {
+          "alias": "ICMP v4",
+          "groupBy": [
+            {
+              "params": [
+                "$__interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "0"
+              ],
+              "type": "fill"
+            }
+          ],
+          "hide": false,
+          "measurement": "blocked",
+          "orderByTime": "ASC",
+          "policy": "default",
+          "refId": "ICMP v4",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "payload"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "mean"
+              }
+            ]
+          ],
+          "tags": [
+            {
+              "key": "proto",
+              "operator": "=",
+              "value": "icmp"
+            }
+          ]
+        },
+        {
+          "alias": "ICMP v6",
+          "groupBy": [
+            {
+              "params": [
+                "$__interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "0"
+              ],
+              "type": "fill"
+            }
+          ],
+          "hide": false,
+          "measurement": "blocked",
+          "orderByTime": "ASC",
+          "policy": "default",
+          "refId": "ICMP v6",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "payload"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "mean"
+              }
+            ]
+          ],
+          "tags": [
+            {
+              "key": "proto",
+              "operator": "=",
+              "value": "icmpv6"
+            }
+          ]
+        }
+      ],
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "Blocked packets by protocol",
+      "transformations": [],
+      "type": "timeseries"
+    },
+    {
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisLabel": "Total packets",
+            "axisPlacement": "auto",
+            "axisWidth": -3,
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "opacity",
+            "hideFrom": {
+              "graph": false,
+              "legend": false,
+              "tooltip": false
+            },
+            "lineInterpolation": "smooth",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "log": 2,
+              "type": "log"
+            },
+            "showPoints": "never",
+            "spanNulls": true
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 12,
+        "x": 0,
+        "y": 45
+      },
+      "id": 13,
+      "options": {
+        "graph": {},
+        "legend": {
+          "calcs": [
+            "sum",
+            "max"
+          ],
+          "displayMode": "table",
+          "placement": "bottom"
+        },
+        "tooltipOptions": {
+          "mode": "single"
+        }
+      },
+      "pluginVersion": "7.4.3",
+      "targets": [
+        {
+          "alias": "Switch 1",
+          "groupBy": [
+            {
+              "params": [
+                "$__interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "0"
+              ],
+              "type": "fill"
+            }
+          ],
+          "hide": false,
+          "measurement": "blocked",
+          "orderByTime": "ASC",
+          "policy": "default",
+          "query": "SELECT cumulative_sum(sum(\"payload\")) FROM \"blocked\" WHERE (\"switch\" = '0000000000000001') AND $timeFilter GROUP BY time($__interval) fill(0)",
+          "rawQuery": false,
+          "refId": "IPv6 Switch 2",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "payload"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "sum"
+              },
+              {
+                "params": [],
+                "type": "cumulative_sum"
+              }
+            ]
+          ],
+          "tags": [
+            {
+              "key": "switch",
+              "operator": "=",
+              "value": "0000000000000001"
+            }
+          ]
+        },
+        {
+          "alias": "Switch 2",
+          "groupBy": [
+            {
+              "params": [
+                "$__interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "0"
+              ],
+              "type": "fill"
+            }
+          ],
+          "hide": false,
+          "measurement": "blocked",
+          "orderByTime": "ASC",
+          "policy": "default",
+          "query": "SELECT cumulative_sum(sum(\"payload\")) FROM \"blocked\" WHERE (\"switch\" = '0000000000000001') AND $timeFilter GROUP BY time($__interval) fill(0)",
+          "rawQuery": false,
+          "refId": "A",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "payload"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "sum"
+              },
+              {
+                "params": [],
+                "type": "cumulative_sum"
+              }
+            ]
+          ],
+          "tags": [
+            {
+              "key": "switch",
+              "operator": "=",
+              "value": "0000000000000002"
+            }
+          ]
+        }
+      ],
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "Logarithmic cumulative blocked packets per Switch",
+      "transformations": [],
+      "type": "timeseries"
+    },
+    {
+      "datasource": null,
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisLabel": "Total packets",
+            "axisPlacement": "auto",
+            "axisWidth": -3,
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "opacity",
             "hideFrom": {
               "graph": false,
               "legend": false,
@@ -67,15 +1503,16 @@
       "gridPos": {
         "h": 9,
         "w": 12,
-        "x": 0,
-        "y": 0
+        "x": 12,
+        "y": 45
       },
-      "id": 2,
+      "id": 15,
       "options": {
         "graph": {},
         "legend": {
           "calcs": [
-            "sum"
+            "sum",
+            "max"
           ],
           "displayMode": "table",
           "placement": "bottom"
@@ -87,50 +1524,7 @@
       "pluginVersion": "7.4.3",
       "targets": [
         {
-          "alias": "IP v6",
-          "groupBy": [
-            {
-              "params": [
-                "$__interval"
-              ],
-              "type": "time"
-            },
-            {
-              "params": [
-                "0"
-              ],
-              "type": "fill"
-            }
-          ],
-          "measurement": "blocked",
-          "orderByTime": "ASC",
-          "policy": "default",
-          "refId": "IP v6",
-          "resultFormat": "time_series",
-          "select": [
-            [
-              {
-                "params": [
-                  "payload"
-                ],
-                "type": "field"
-              },
-              {
-                "params": [],
-                "type": "mean"
-              }
-            ]
-          ],
-          "tags": [
-            {
-              "key": "ip_proto",
-              "operator": "=",
-              "value": "ipv6"
-            }
-          ]
-        },
-        {
-          "alias": "IP v4",
+          "alias": "Switch 1",
           "groupBy": [
             {
               "params": [
@@ -149,7 +1543,9 @@
           "measurement": "blocked",
           "orderByTime": "ASC",
           "policy": "default",
-          "refId": "IP v4",
+          "query": "SELECT cumulative_sum(sum(\"payload\")) FROM \"blocked\" WHERE (\"switch\" = '0000000000000001') AND $timeFilter GROUP BY time($__interval) fill(0)",
+          "rawQuery": false,
+          "refId": "IPv6 Switch 2",
           "resultFormat": "time_series",
           "select": [
             [
@@ -161,22 +1557,76 @@
               },
               {
                 "params": [],
-                "type": "mean"
+                "type": "sum"
+              },
+              {
+                "params": [],
+                "type": "cumulative_sum"
               }
             ]
           ],
           "tags": [
             {
-              "key": "ip_proto",
+              "key": "switch",
               "operator": "=",
-              "value": "ipv4"
+              "value": "0000000000000001"
+            }
+          ]
+        },
+        {
+          "alias": "Switch 2",
+          "groupBy": [
+            {
+              "params": [
+                "$__interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "0"
+              ],
+              "type": "fill"
+            }
+          ],
+          "hide": false,
+          "measurement": "blocked",
+          "orderByTime": "ASC",
+          "policy": "default",
+          "query": "SELECT cumulative_sum(sum(\"payload\")) FROM \"blocked\" WHERE (\"switch\" = '0000000000000001') AND $timeFilter GROUP BY time($__interval) fill(0)",
+          "rawQuery": false,
+          "refId": "A",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "payload"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "sum"
+              },
+              {
+                "params": [],
+                "type": "cumulative_sum"
+              }
+            ]
+          ],
+          "tags": [
+            {
+              "key": "switch",
+              "operator": "=",
+              "value": "0000000000000002"
             }
           ]
         }
       ],
       "timeFrom": null,
       "timeShift": null,
-      "title": "Blocked Ipv4 & Ipv6 over time",
+      "title": "Cumulative blocked packets per Switch",
       "transformations": [],
       "type": "timeseries"
     }
@@ -186,7 +1636,36 @@
   "style": "dark",
   "tags": [],
   "templating": {
-    "list": []
+    "list": [
+      {
+        "allValue": "10.0.0.3",
+        "current": {
+          "selected": false,
+          "text": "10.0.0.4",
+          "value": "10.0.0.4"
+        },
+        "datasource": null,
+        "definition": "select ip_src from blocked",
+        "description": null,
+        "error": null,
+        "hide": 0,
+        "includeAll": false,
+        "label": null,
+        "multi": true,
+        "name": "ips",
+        "options": [],
+        "query": "select ip_src from blocked",
+        "refresh": 2,
+        "regex": "^(?:[0-9]{1,3}\\.){3}[0-9]{1,3}$",
+        "skipUrlSync": false,
+        "sort": 0,
+        "tagValuesQuery": "",
+        "tags": [],
+        "tagsQuery": "",
+        "type": "query",
+        "useTags": false
+      }
+    ]
   },
   "time": {
     "from": "now-6h",
@@ -196,5 +1675,5 @@
   "timezone": "",
   "title": "SDNSec",
   "uid": "-rPkI8X7k",
-  "version": 4
+  "version": 28
 }
