@@ -2,7 +2,7 @@ import array
 
 from ryu.controller.handler import MAIN_DISPATCHER, set_ev_cls
 from ryu.lib import snortlib
-from ryu.lib.packet import packet, ethernet, arp, ipv4, icmp, tcp, udp
+from ryu.lib.packet import packet, arp, ethernet, ipv4, ipv6, icmp, icmpv6, tcp, udp
 
 from ryu.controller import ofp_event
 
@@ -15,8 +15,9 @@ import json
 import socket
 import datetime
 
+
 class Project(SimpleSwitchSnort):
-    ICMP_FLOOD = "0"
+    REDIRECTED_MSG = "redirected,switch=%016x eth_src=\"%s\",eth_dst=\"%s\",ip_src=\"%s\",ip_dst=\"%s\",payload=%d,proto=\"%s\" %d"
 
     DMZ_IP = '10.0.0.1'
     DMZ_MAC = '00:00:00:00:00:01'
@@ -60,6 +61,7 @@ class Project(SimpleSwitchSnort):
         _ipv4 = pkt.get_protocol(ipv4.ipv4)
         if self.is_redirecting_to_honeypot and _ipv4 and _ipv4.src == self.INTERNET_IP and _ipv4.dst == self.DMZ_IP:
             self.redirect_to_honeypot(msg, pkt)
+            self.influx(ev)
             return
 
         # learn a mac address to avoid FLOOD next time.
@@ -91,14 +93,14 @@ class Project(SimpleSwitchSnort):
         msg = ev.msg
         pkt = packet.Packet(array.array('B', msg.pkt))
         alert_msg = int(msg.alertmsg[0].decode()[0:3])
-        
-        sw_id = str(int(alert_msg/100))
-        if alert_msg%100 == 1:
+
+        sw_id = str(int(alert_msg / 100))
+        if alert_msg % 100 == 1:
             proto = "ICMP"
-        elif alert_msg%100 == 2:
+        elif alert_msg % 100 == 2:
             proto = "TCP"
         else:
-            print(alert_msg)
+            self.logger.info(alert_msg)
             return
 
         self.print_packet_data(pkt)
@@ -117,12 +119,10 @@ class Project(SimpleSwitchSnort):
         if self.fw_check(_ipv4.src, _ipv4.dst, proto, sw_id):
             self.fw_deny(_ipv4.src, _ipv4.dst, proto, sw_id)
 
-        #self.influx(ev)
-
     def fw_check(self, nw_src, nw_dst, nw_proto, sw_id):
         priority = 10
 
-        url = 'http://localhost:8080/firewall/rules/000000000000000' + sw_id
+        url = 'http://localhost:8080/firewall/rules/000000000000000%s' % str(sw_id)
         response = requests.get(url)
         data = response.text
         data_json = json.loads(data)
@@ -222,29 +222,32 @@ class Project(SimpleSwitchSnort):
             self.logger.info("UDP: %r", _udp)
 
     def influx(self, ev):
-        DETECTIONS_MSG = "detections,switch=\"%016x\" ipv4_src=\"%s\",ipv4_dst=\"%s\",packets=%d,bytes=%d %d"
-        body = ev.msg.body
-        self.logger.info(body)
-        # self.logger.info('stats received: %016x', ev.msg.datapath.id)
-        #
-        # OFPFlowStats(byte_count=536328828, cookie=21, duration_nsec=763000000, duration_sec=3091, flags=0,
-        #              hard_timeout=0, idle_timeout=0, instructions=[], length=80, match=OFPMatch(
-        #         oxm_fields={'eth_type': 2048, 'ipv4_src': '10.0.0.3', 'ipv4_dst': '10.0.0.4', 'ip_proto': 1}),
-        #              packet_count=371934, priority=10, table_id=0),
+        msg = ev.msg
+        pkt = packet.Packet(msg.data)
+        datapath = msg.datapath
 
-        self.logger.info(len(body))
-        flows = [flow for flow in body if (flow.match and flow.priority >= 10 and flow.priority <= 20)]
-        self.logger.info(len(flows))
+        self.logger.info(pkt)
+        self.logger.info(datapath)
 
-        for stat in flows:
-            self.logger.info(stat)
+        _ethernet = pkt.get_protocol(ethernet.ethernet)
+        _ipv4 = pkt.get_protocol(ipv4.ipv4)
+        _icmpv4 = pkt.get_protocol(icmp.icmp)
+
+        l4_protocol_name = _ipv4.protocol_name
+        if _icmpv4:
+            l4_protocol_name = _icmpv4.protocol_name
+
+        if _ipv4:
             timestamp = int(datetime.datetime.now().timestamp() * 1000000000)
-            msg = DETECTIONS_MSG % (ev.msg.datapath.id,
-                                    stat.match['ipv4_src'],
-                                    stat.match['ipv4_dst'],
-                                    stat.packet_count,
-                                    stat.byte_count,
-                                    timestamp)
+
+            msg = self.REDIRECTED_MSG % (msg.datapath.id,
+                                         _ethernet.src,
+                                         _ethernet.dst,
+                                         _ipv4.src,
+                                         _ipv4.dst,
+                                         _ipv4.total_length,
+                                         l4_protocol_name,
+                                         timestamp)
 
             self.logger.info(msg)
             sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
