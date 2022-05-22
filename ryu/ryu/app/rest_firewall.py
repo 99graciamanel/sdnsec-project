@@ -31,113 +31,17 @@ from ryu.lib import dpid as dpid_lib
 from ryu.lib import ofctl_v1_0
 from ryu.lib import ofctl_v1_2
 from ryu.lib import ofctl_v1_3
-from ryu.lib.packet import packet
 from ryu.ofproto import ether
 from ryu.ofproto import inet
 from ryu.ofproto import ofproto_v1_0
 from ryu.ofproto import ofproto_v1_2
-from ryu.ofproto import ofproto_v1_2_parser
 from ryu.ofproto import ofproto_v1_3
 from ryu.ofproto import ofproto_v1_3_parser
 
-# =============================
-#          REST API
-# =============================
-#
-#  Note: specify switch and vlan group, as follows.
-#   {switch-id} : 'all' or switchID
-#   {vlan-id}   : 'all' or vlanID
-#
-#
-
-# about Firewall status
-#
-# get status of all firewall switches
-# GET /firewall/module/status
-#
-# set enable the firewall switches
-# PUT /firewall/module/enable/{switch-id}
-#
-# set disable the firewall switches
-# PUT /firewall/module/disable/{switch-id}
-#
-
-# about Firewall logs
-#
-# get log status of all firewall switches
-# GET /firewall/log/status
-#
-# set log enable the firewall switches
-# PUT /firewall/log/enable/{switch-id}
-#
-# set log disable the firewall switches
-# PUT /firewall/log/disable/{switch-id}
-#
-
-# about Firewall rules
-#
-# get rules of the firewall switches
-# * for no vlan
-# GET /firewall/rules/{switch-id}
-#
-# * for specific vlan group
-# GET /firewall/rules/{switch-id}/{vlan-id}
-#
-#
-# set a rule to the firewall switches
-# * for no vlan
-# POST /firewall/rules/{switch-id}
-#
-# * for specific vlan group
-# POST /firewall/rules/{switch-id}/{vlan-id}
-#
-#  request body format:
-#   {"<field1>":"<value1>", "<field2>":"<value2>",...}
-#
-#     <field>  : <value>
-#    "priority": "0 to 65533"
-#    "in_port" : "<int>"
-#    "dl_src"  : "<xx:xx:xx:xx:xx:xx>"
-#    "dl_dst"  : "<xx:xx:xx:xx:xx:xx>"
-#    "dl_type" : "<ARP or IPv4 or IPv6>"
-#    "nw_src"  : "<A.B.C.D/M>"
-#    "nw_dst"  : "<A.B.C.D/M>"
-#    "ipv6_src": "<xxxx:xxxx:xxxx:xxxx:xxxx:xxxx:xxxx:xxxx/M>"
-#    "ipv6_dst": "<xxxx:xxxx:xxxx:xxxx:xxxx:xxxx:xxxx:xxxx/M>"
-#    "nw_proto": "<TCP or UDP or ICMP or ICMPv6>"
-#    "tp_src"  : "<int>"
-#    "tp_dst"  : "<int>"
-#    "actions" : "<ALLOW or DENY>"
-#
-#   Note: specifying nw_src/nw_dst
-#         without specifying dl-type as "ARP" or "IPv4"
-#         will automatically set dl-type as "IPv4".
-#
-#   Note: specifying ipv6_src/ipv6_dst
-#         without specifying dl-type as "IPv6"
-#         will automatically set dl-type as "IPv6".
-#
-#   Note: When "priority" has not been set up,
-#         "0" is set to "priority".
-#
-#   Note: When "actions" has not been set up,
-#         "ALLOW" is set to "actions".
-#
-#
-# delete a rule of the firewall switches from ruleID
-# * for no vlan
-# DELETE /firewall/rules/{switch-id}
-#
-# * for specific vlan group
-# DELETE /firewall/rules/{switch-id}/{vlan-id}
-#
-#  request body format:
-#   {"<field>":"<value>"}
-#
-#     <field>  : <value>
-#    "rule_id" : "<int>" or "all"
-#
-
+from ryu.lib.packet import packet, ethernet, ipv4, ipv6, icmp, icmpv6, tcp, udp
+from ryu.lib import hub
+import socket
+import datetime
 
 SWITCHID_PATTERN = dpid_lib.DPID_PATTERN + r'|all'
 VLANID_PATTERN = r'[0-9]{1,4}|all'
@@ -200,8 +104,15 @@ class RestFirewallAPI(app_manager.RyuApp):
     _CONTEXTS = {'dpset': dpset.DPSet,
                  'wsgi': WSGIApplication}
 
+    UDP_IP = "127.0.0.1"
+    UDP_PORT = 8094
+    DETECTIONS_MSG = "blocked,switch=%016x eth_src=\"%s\",eth_dst=\"%s\",ip_proto=\"%s\",ip_src=\"%s\",ip_dst=\"%s\",payload=%d,proto=\"%s\" %d"
+
     def __init__(self, *args, **kwargs):
         super(RestFirewallAPI, self).__init__(*args, **kwargs)
+
+        self.datapaths = {}
+        self.monitor_thread = hub.spawn(self._monitor)
 
         # logger configure
         FirewallController.set_logger(self.logger)
@@ -289,6 +200,23 @@ class RestFirewallAPI(app_manager.RyuApp):
                        conditions=dict(method=['DELETE']),
                        requirements=requirements)
 
+    def _monitor(self):
+        while True:
+            for dp in self.datapaths.values():
+                self._request_stats(dp)
+            hub.sleep(10)
+
+    def _request_stats(self, datapath):
+        self.logger.debug('send stats request: %016x', datapath.id)
+        ofproto = datapath.ofproto
+        parser = datapath.ofproto_parser
+
+        req = parser.OFPFlowStatsRequest(datapath)
+        datapath.send_msg(req)
+
+        req = parser.OFPPortStatsRequest(datapath, 0, ofproto.OFPP_ANY)
+        datapath.send_msg(req)
+
     def stats_reply_handler(self, ev):
         msg = ev.msg
         dp = msg.datapath
@@ -332,6 +260,64 @@ class RestFirewallAPI(app_manager.RyuApp):
     @set_ev_cls(ofp_event.EventOFPPacketIn, MAIN_DISPATCHER)
     def packet_in_handler(self, ev):
         FirewallController.packet_in_handler(ev.msg)
+        self.inluxdb_blocked_packet(ev.msg)
+
+    def inluxdb_blocked_packet(self, msg):
+        pkt = packet.Packet(msg.data)
+        # ethernet(dst='33:33:00:00:00:02',ethertype=34525,src='00:00:00:00:00:02'),
+        # ipv6(dst='ff02::2',ext_hdrs=[],flow_label=0,hop_limit=255,nxt=58,payload_length=16,src='fe80::200:ff:fe00:2',traffic_class=0,version=6),
+        # icmpv6(code=0,csum=31530,data=nd_router_solicit(option=nd_option_sla(data=None,hw_src='00:00:00:00:00:02',length=1),res=0),type_=133)
+
+        _ethernet = pkt.get_protocol(ethernet.ethernet)
+        _ipv4 = pkt.get_protocol(ipv4.ipv4)
+        _ipv6 = pkt.get_protocol(ipv6.ipv6)
+
+        _icmpv4 = pkt.get_protocol(icmp.icmp)
+        _icmpv6 = pkt.get_protocol(icmpv6.icmpv6)
+        _tcp = pkt.get_protocol(tcp.tcp)
+        _udp = pkt.get_protocol(udp.udp)
+
+        l4_protocol_name = None
+        if _icmpv4:
+            l4_protocol_name = _icmpv4.protocol_name
+        elif _icmpv6:
+            l4_protocol_name = _icmpv6.protocol_name
+        elif _tcp:
+            l4_protocol_name = _tcp.protocol_name
+        elif _udp:
+            l4_protocol_name = _udp.protocol_name
+
+        if _ipv4:
+            timestamp = int(datetime.datetime.now().timestamp() * 1000000000)
+
+            msg = self.DETECTIONS_MSG % (msg.datapath.id,
+                                         _ethernet.src,
+                                         _ethernet.dst,
+                                         _ipv4.protocol_name,
+                                         _ipv4.src,
+                                         _ipv4.dst,
+                                         _ipv4.total_length,
+                                         l4_protocol_name,
+                                         timestamp)
+
+            self.logger.info(msg)
+            sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            sock.sendto(msg.encode(), (self.UDP_IP, self.UDP_PORT))
+        elif _ipv6:
+            timestamp = int(datetime.datetime.now().timestamp() * 1000000000)
+            msg = self.DETECTIONS_MSG % (msg.datapath.id,
+                                         _ethernet.src,
+                                         _ethernet.dst,
+                                         _ipv6.protocol_name,
+                                         _ipv6.src,
+                                         _ipv6.dst,
+                                         _ipv6.payload_length,
+                                         l4_protocol_name,
+                                         timestamp)
+
+            self.logger.info(msg)
+            sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            sock.sendto(msg.encode(), (self.UDP_IP, self.UDP_PORT))
 
 
 class FirewallOfsList(dict):
@@ -381,7 +367,7 @@ class FirewallController(ControllerBase):
     @staticmethod
     def regist_ofs(dp):
         dpid_str = dpid_lib.dpid_to_str(dp.id)
-        
+
         try:
             f_ofs = Firewall(dp)
         except OFPUnknownVersion as message:
@@ -547,8 +533,7 @@ class FirewallController(ControllerBase):
     def packet_in_handler(msg):
         pkt = packet.Packet(msg.data)
         dpid_str = dpid_lib.dpid_to_str(msg.datapath.id)
-        FirewallController._LOGGER.info('dpid=%s: Blocked packet = %s',
-                                        dpid_str, pkt)
+        FirewallController._LOGGER.info('dpid=%s: Blocked packet = %s', dpid_str, pkt)
 
 
 class Firewall(object):
@@ -743,10 +728,10 @@ class Firewall(object):
             rest[REST_DL_VLAN] = vlan_id
 
         match = Match.to_openflow(rest)
-        # if rest.get(REST_ACTION) == REST_ACTION_DENY:
-        #     result = self.get_log_status(waiters)
-        #     if result[REST_LOG_STATUS] == REST_STATUS_ENABLE:
-        #         rest[REST_ACTION] = REST_ACTION_PACKETIN
+        if rest.get(REST_ACTION) == REST_ACTION_DENY:
+            result = self.get_log_status(waiters)
+            if result[REST_LOG_STATUS] == REST_STATUS_ENABLE:
+                rest[REST_ACTION] = REST_ACTION_PACKETIN
         actions = Action.to_openflow(rest)
         flow = self._to_of_flow(cookie=cookie, priority=priority,
                                 match=match, actions=actions)

@@ -9,6 +9,8 @@ from ryu.lib import hub
 import socket
 import datetime
 
+from ryu.lib.packet.ether_types import ETH_TYPE_IP
+
 UDP_IP = "127.0.0.1"
 UDP_PORT = 8094
 
@@ -20,8 +22,7 @@ class SimpleMonitor13(simple_switch_13.SimpleSwitch13):
         self.datapaths = {}
         self.monitor_thread = hub.spawn(self._monitor)
 
-    @set_ev_cls(ofp_event.EventOFPStateChange,
-                [MAIN_DISPATCHER, DEAD_DISPATCHER])
+    @set_ev_cls(ofp_event.EventOFPStateChange, [MAIN_DISPATCHER, DEAD_DISPATCHER])
     def _state_change_handler(self, ev):
         datapath = ev.datapath
         if ev.state == MAIN_DISPATCHER:
@@ -52,19 +53,30 @@ class SimpleMonitor13(simple_switch_13.SimpleSwitch13):
 
     @set_ev_cls(ofp_event.EventOFPFlowStatsReply, MAIN_DISPATCHER)
     def _flow_stats_reply_handler(self, ev):
-        FLOW_MSG = "flows,datapath=%x in-port=%x,eth-dst=\"%s\",out-port=%x,packets=%d,bytes=%d %d"
+        DETECTIONS_MSG = "detections,switch=\"%016x\" ipv4_src=\"%s\",ipv4_dst=\"%s\",packets=%d,bytes=%d %d"
         body = ev.msg.body
-        self.logger.info('stats received: %016x', ev.msg.datapath.id)
+        self.logger.info(body)
+        # self.logger.info('stats received: %016x', ev.msg.datapath.id)
+        #
+        # OFPFlowStats(byte_count=536328828, cookie=21, duration_nsec=763000000, duration_sec=3091, flags=0,
+        #              hard_timeout=0, idle_timeout=0, instructions=[], length=80, match=OFPMatch(
+        #         oxm_fields={'eth_type': 2048, 'ipv4_src': '10.0.0.3', 'ipv4_dst': '10.0.0.4', 'ip_proto': 1}),
+        #              packet_count=371934, priority=10, table_id=0),
 
-        for stat in sorted([flow for flow in body if flow.priority == 1],
-                           key=lambda flow: (flow.match['in_port'],
-                                             flow.match['eth_dst'])):
+        self.logger.info(len(body))
+        flows = [flow for flow in body if (flow.match and flow.priority >= 10 and flow.priority <= 20)]
+        self.logger.info(len(flows))
+
+        for stat in flows:
+            self.logger.info(stat)
             timestamp = int(datetime.datetime.now().timestamp() * 1000000000)
-            msg = FLOW_MSG % (ev.msg.datapath.id,
-                             stat.match['in_port'], stat.match['eth_dst'],
-                             stat.instructions[0].actions[0].port,
-                             stat.packet_count, stat.byte_count,
-                             timestamp)
+            msg = DETECTIONS_MSG % (ev.msg.datapath.id,
+                                    stat.match['ipv4_src'],
+                                    stat.match['ipv4_dst'],
+                                    stat.packet_count,
+                                    stat.byte_count,
+                                    timestamp)
+
             self.logger.info(msg)
             sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
             sock.sendto(msg.encode(), (UDP_IP, UDP_PORT))
@@ -77,15 +89,16 @@ class SimpleMonitor13(simple_switch_13.SimpleSwitch13):
 
         for stat in sorted(body, key=attrgetter('port_no')):
             timestamp = int(datetime.datetime.now().timestamp() * 1000000000)
-            msg = PORT_MSG % (ev.msg.datapath.id, stat.port_no,
-                             stat.rx_packets, stat.rx_bytes, stat.rx_errors,
-                             stat.tx_packets, stat.tx_bytes, stat.tx_errors,
-                             timestamp)
+            msg = PORT_MSG % (ev.msg.datapath.id,
+                              stat.port_no,
+                              stat.rx_packets,
+                              stat.rx_bytes,
+                              stat.rx_errors,
+                              stat.tx_packets,
+                              stat.tx_bytes,
+                              stat.tx_errors,
+                              timestamp)
+
             self.logger.info(msg)
             sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
             sock.sendto(msg.encode(), (UDP_IP, UDP_PORT))
-                             
-                             
-                             
-                             
-                             
