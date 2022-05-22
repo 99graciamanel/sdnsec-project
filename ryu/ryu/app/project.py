@@ -12,7 +12,8 @@ from simple_switch_snort import SimpleSwitchSnort
 
 import requests
 import json
-
+import socket
+import datetime
 
 class Project(SimpleSwitchSnort):
     ICMP_FLOOD = "0"
@@ -28,6 +29,9 @@ class Project(SimpleSwitchSnort):
     INTERNET_IP = '10.0.0.3'
     INTERNET_MAC = '00:00:00:00:00:03'
     INTERNET_PORT = 1
+
+    UDP_IP = "127.0.0.1"
+    UDP_PORT = 8094
 
     def __init__(self, *args, **kwargs):
         super(Project, self).__init__(*args, **kwargs)
@@ -105,13 +109,15 @@ class Project(SimpleSwitchSnort):
             self.is_redirecting_to_honeypot = True
             self.fw_controller(_ipv4.src, _ipv4.dst, "ICMP")
         else:
-            self.optimistic_fw_block(pkt, proto, sw_id)
+            self.optimistic_fw_block(ev, pkt, proto, sw_id)
 
-    def optimistic_fw_block(self, pkt, proto, sw_id):
+    def optimistic_fw_block(self, ev, pkt, proto, sw_id):
         _ipv4 = pkt.get_protocol(ipv4.ipv4)
 
         if self.fw_check(_ipv4.src, _ipv4.dst, proto, sw_id):
             self.fw_deny(_ipv4.src, _ipv4.dst, proto, sw_id)
+
+        #self.influx(ev)
 
     def fw_check(self, nw_src, nw_dst, nw_proto, sw_id):
         priority = 10
@@ -120,6 +126,11 @@ class Project(SimpleSwitchSnort):
         response = requests.get(url)
         data = response.text
         data_json = json.loads(data)
+
+        self.logger.info(data_json)
+
+        if len(data_json[0].get('access_control_list')) == 0:
+            return True
 
         for json_rule in data_json[0].get('access_control_list')[0].get('rules'):
             if nw_src == json_rule.get('nw_src') and nw_dst == json_rule.get('nw_dst') and priority == json_rule.get(
@@ -209,3 +220,32 @@ class Project(SimpleSwitchSnort):
             self.logger.info("TCP: %r", _tcp)
         if _udp:
             self.logger.info("UDP: %r", _udp)
+
+    def influx(self, ev):
+        DETECTIONS_MSG = "detections,switch=\"%016x\" ipv4_src=\"%s\",ipv4_dst=\"%s\",packets=%d,bytes=%d %d"
+        body = ev.msg.body
+        self.logger.info(body)
+        # self.logger.info('stats received: %016x', ev.msg.datapath.id)
+        #
+        # OFPFlowStats(byte_count=536328828, cookie=21, duration_nsec=763000000, duration_sec=3091, flags=0,
+        #              hard_timeout=0, idle_timeout=0, instructions=[], length=80, match=OFPMatch(
+        #         oxm_fields={'eth_type': 2048, 'ipv4_src': '10.0.0.3', 'ipv4_dst': '10.0.0.4', 'ip_proto': 1}),
+        #              packet_count=371934, priority=10, table_id=0),
+
+        self.logger.info(len(body))
+        flows = [flow for flow in body if (flow.match and flow.priority >= 10 and flow.priority <= 20)]
+        self.logger.info(len(flows))
+
+        for stat in flows:
+            self.logger.info(stat)
+            timestamp = int(datetime.datetime.now().timestamp() * 1000000000)
+            msg = DETECTIONS_MSG % (ev.msg.datapath.id,
+                                    stat.match['ipv4_src'],
+                                    stat.match['ipv4_dst'],
+                                    stat.packet_count,
+                                    stat.byte_count,
+                                    timestamp)
+
+            self.logger.info(msg)
+            sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            sock.sendto(msg.encode(), (self.UDP_IP, self.UDP_PORT))
