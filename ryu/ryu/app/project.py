@@ -91,18 +91,11 @@ class Project(SimpleSwitchSnort):
         msg = ev.msg
         pkt = packet.Packet(array.array('B', msg.pkt))
         alert_msg = int(msg.alertmsg[0].decode()[0:3])
-
-        if alert_msg == 101:
-            sw_id = "1"
+        
+        sw_id = str(int(alert_msg/100))
+        if alert_msg%100 == 1:
             proto = "ICMP"
-        elif alert_msg == 102:
-            sw_id = "1"
-            proto = "TCP"
-        elif alert_msg == 201:
-            sw_id = "2"
-            proto = "ICMP"
-        elif alert_msg == 202:
-            sw_id = "2"
+        elif alert_msg%100 == 2:
             proto = "TCP"
         else:
             print(alert_msg)
@@ -111,7 +104,7 @@ class Project(SimpleSwitchSnort):
         self.print_packet_data(pkt)
 
         _ipv4 = pkt.get_protocol(ipv4.ipv4)
-        if _ipv4 and _ipv4.src == '10.0.0.3' and _ipv4.dst == '10.0.0.1':
+        if _ipv4 and _ipv4.src == self.INTERNET_IP and _ipv4.dst == self.DMZ_IP:
             self.logger.info("is_redirecting_to_honeypot = True")
             self.is_redirecting_to_honeypot = True
             self.fw_controller(_ipv4.src, _ipv4.dst, "ICMP")
